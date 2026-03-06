@@ -1,7 +1,10 @@
 ## Student Name: Youwei Qin
 ## Student ID: 219690858
 
-Prompt #1: {I am planning to design a system in python that could manage event registration for one event with limited capacity. 
+Prompt #1: {
+    Purpose: Find out any missing requriments.
+
+    I am planning to design a system in python that could manage event registration for one event with limited capacity. 
 It keeps extra users in a FIFO waitlist, prevents duplicate registrations, and promotes the earliest waitlisted user when a spot becomes available. 
 Here's the functional requirements:
 FR1: The system shall accept a fixed event capacity during initialization.
@@ -59,4 +62,147 @@ Decision #1: {
 
 --------------------------------------------------
 
-Prompt #2:
+Prompt #2:{
+Purpose: finish the to-do
+
+Based on the previous suggestions, here are my decisions:
+1. Accepted: Each user will be uniquely identified by a user_id.
+2. Accepted: Duplicate registration attempts will not modify the system state.
+3. Accepted: Cancelling a user not currently in the system will not modify the system state.
+4. Rejected: FIFO promotion clarification is unnecessary because FIFO ordering is already defined in FR10 and constraint C5.
+Based on all the requirements I provided earlier, please help me complete the TODO parts in the provided EventRegistration class. Do not modify the other parts 
+that do not have "TODO" comments
+
+from dataclasses import dataclass
+from typing import List, Optional
+
+
+class DuplicateRequest(Exception):
+    """Raised if a user tries to register but is already registered or waitlisted."""
+    pass
+
+
+class NotFound(Exception):
+    """Raised if a user cannot be found for cancellation (if required by handout)."""
+    pass
+
+
+@dataclass(frozen=True)
+class UserStatus:
+    """
+    state:
+      - "registered"
+      - "waitlisted"
+      - "none"
+    position: 1-based waitlist position if waitlisted; otherwise None
+    """
+    state: str
+    position: Optional[int] = None
+
+
+class EventRegistration:
+    """
+    Students must implement this class per the lab handout.
+    Deterministic ordering is required (e.g., FIFO waitlist, predictable registration order).
+    """
+
+    def __init__(self, capacity: int) -> None:
+        """
+        Args:
+            capacity: maximum number of registered users (>= 0)
+        """
+        # TODO: Initialize internal data structures
+        raise NotImplementedError("EventRegistration.__init__ not implemented yet")
+
+    def register(self, user_id: str) -> UserStatus:
+        """
+        Register a user:
+          - if capacity available -> registered
+          - else -> waitlisted (FIFO)
+
+        Raises:
+            DuplicateRequest if user already exists (registered or waitlisted)
+        """
+        # TODO: Implement per lab handout
+        raise NotImplementedError("register not implemented yet")
+
+    def cancel(self, user_id: str) -> None:
+        """
+        Cancel a user:
+          - if registered -> remove and promote earliest waitlisted user (if any)
+          - if waitlisted -> remove from waitlist
+          - behavior when user not found depends on handout (raise NotFound or ignore)
+
+        Raises:
+            NotFound (if required by handout)
+        """
+        # TODO: Implement per lab handout
+        raise NotImplementedError("cancel not implemented yet")
+
+    def status(self, user_id: str) -> UserStatus:
+        """
+        Return status of a user:
+          - registered
+          - waitlisted with position (1-based)
+          - none
+        """
+        # TODO: Implement per lab handout
+        raise NotImplementedError("status not implemented yet")
+
+    def snapshot(self) -> dict:
+        """
+        (Optional helper for debugging/tests)
+        Return a deterministic snapshot of internal state.
+        """
+        # TODO: Implement if required/allowed
+        raise NotImplementedError("snapshot not implemented yet")
+}
+
+Response #2: {
+The GPT suggested to have two lists: registered users and  waitlisted users. 
+The register method checks the capacity and adds users to the registered list or the waitlist accordingly. 
+The cancel method removes a user and promotes the earliest waitlisted user if a spot becomes available.
+The status method returns whether the user is registered, waitlisted with a position, or not in the system. 
+The snapshot method returns the current registration state.
+}
+
+Decision #: {
+Accepted the suggested implementation approach and used it to complete the TODO methods in solution.py.
+}
+
+
+----------------------------------------------------
+prompt #3: {
+    purpose： Find out the reason that failing test related to cancelling a non-existent user.
+
+    I implemented the EventRegistration system based on the complete code you provided and then I run the tests.py, the following test failed:
+________________________________________________ test_capacity_zero_all_waitlisted_and_promotion_never_happens ________________________________________________
+
+    def test_capacity_zero_all_waitlisted_and_promotion_never_happens():
+        er = EventRegistration(capacity=0)
+        assert er.register("u1") == UserStatus("waitlisted", 1)
+        assert er.register("u2") == UserStatus("waitlisted", 2)
+    
+        # No one can ever be registered when capacity=0
+        assert er.status("u1") == UserStatus("waitlisted", 1)
+        assert er.status("u2") == UserStatus("waitlisted", 2)
+        assert er.snapshot()["registered"] == []
+    
+        # Cancel unknown should raise NotFound
+>       with pytest.raises(NotFound):
+             ^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE <class 'solution.NotFound'>
+
+tests.py:79: Failed
+=================================================================== short test summary info ===================================================================
+FAILED tests.py::test_capacity_zero_all_waitlisted_and_promotion_never_happens - Failed: DID NOT RAISE <class 'solution.NotFound'>}
+
+Response #3: {
+The model explained that the cancel() method currently ignores cancellation requests for users not in the system. 
+However, the test suite requires that cancelling a non-existent user should raise a NotFound exception. 
+The fix is to modify cancel() so that it checks whether the user exists, and raises NotFound if the user is not found.
+}
+
+Decision #3: {
+    Accepted
+}
