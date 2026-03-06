@@ -116,16 +116,19 @@ class EventRegistration:
         """
         # TODO: Implement per lab handout
         if user_id not in self.users:
-            return
+            raise NotFound(f"{user_id} not found")
 
+    # Case 1: cancel registered user
         if user_id in self.registered:
             self.registered.remove(user_id)
             self.users.remove(user_id)
 
+        # promote only when a registered user cancels
             if self.waitlist:
                 promoted = self.waitlist.pop(0)
                 self.registered.append(promoted)
 
+    # Case 2: cancel waitlisted user
         elif user_id in self.waitlist:
             self.waitlist.remove(user_id)
             self.users.remove(user_id)
