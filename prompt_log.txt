@@ -1,6 +1,62 @@
-## Student Name:
-## Student ID: 
+## Student Name: Youwei Qin
+## Student ID: 219690858
 
-Prompt #1: {}
-Response #1: {}
+Prompt #1: {I am planning to design a system in python that could manage event registration for one event with limited capacity. 
+It keeps extra users in a FIFO waitlist, prevents duplicate registrations, and promotes the earliest waitlisted user when a spot becomes available. 
+Here's the functional requirements:
+FR1: The system shall accept a fixed event capacity during initialization.
+
+FR2: The system shall allow users to register for the event.
+
+FR3: The system shall add users to the registered list if the current number of registered users is less than the event capacity.
+
+FR4: The system shall place users into a FIFO waitlist if the event capacity has been reached.
+
+FR5: The system shall prevent duplicate registrations for the same user.
+
+FR6: The system shall allow a registered user to cancel their registration.
+
+FR7: The system shall allow a waitlisted user to cancel their waitlist position.
+
+FR8: When a registered user cancels, the system shall automatically promote the first user in the waitlist to the registered list.
+
+FR9: The system shall allow users to query their current status.
+
+FR10: The system shall maintain FIFO ordering in the waitlist , constraints: C1: The event capacity must be a non-negative integer.
+The constraints：
+C2: The system must correctly handle the case where the capacity is zero.
+C3: Promotions occur deterministically under identical operation sequences
+C4: The system must update the registration and waitlist lists after every operation.
+C5: Waitlist ordering preserves FIFO behavior.
+C6: Operations must be processed sequentially in the order they are received.
+Invariants:
+The number of registered users must never exceed the event capacity.
+A user may appear only once in the system.
+A user may not simultaneously exist in multiple states.
+Acceptance Criteria:
+AC1: Negative capacity values must be rejected.
+AC2: If capacity is zero, users registering must be placed in the waitlist.
+AC3: If capacity allows, users registering must be added to the registered list.
+AC4: If capacity is full, additional users registering must be added to the waitlist.
+AC5: When a registered user cancels, the earliest waitlisted user must be promoted.
+AC6: Executing the same sequence of operations must always produce the same promotion result.Question:
+Before implementing the system, are there any ambiguities or missing clarifications exist.?}
+
+Response #1: {
+The model suggested to clarify some possible ambiguities in the requirements. 
+1.How users are uniquely identified
+2.How duplicate registration attempts should be handled
+3.What should happen if a user cancels but is not currently registered or on the waitlist. 
+4.The format of the query result and confirming that the waitlist promotion must always follow FIFO order.
+}
+
+Decision #1: {
+1. Accepted: Each user will be uniquely identified by a user_id.
+2. Accepted: Duplicate registration attempts will not modify the system state.
+3. Accepted: Cancelling a user not currently in the system will not modify the system state.
+4. Rejected: FIFO promotion clarification is unnecessary because FIFO ordering is already defined in FR10 and constraint C5.
+}
+
 --------------------------------------------------
+
+Prompt #2:
