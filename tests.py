@@ -84,3 +84,36 @@ def test_capacity_zero_all_waitlisted_and_promotion_never_happens():
 #################################################################################
 # Add your own additional tests here to cover more cases and edge cases as needed.
 #################################################################################
+
+# Test: user can re-register after cancelling
+def test_reregister_after_cancel():
+    er = EventRegistration(capacity=1)
+
+    er.register("u1")
+    er.cancel("u1")
+
+    status = er.register("u1")
+
+    assert status == UserStatus("registered")
+
+
+# Test: multiple cancellations in sequence with promotions
+def test_multiple_cancellations_sequence():
+    er = EventRegistration(capacity=1)
+
+    er.register("u1")
+    er.register("u2")
+    er.register("u3")
+
+    er.cancel("u1")  # u2 should be promoted
+    er.cancel("u2")  # u3 should be promoted
+
+    assert er.status("u3") == UserStatus("registered")
+
+
+# Test: querying status for a user not in the system
+# This verifies that the system correctly returns "none" for unknown users.
+def test_status_unknown_user():
+    er = EventRegistration(capacity=1)
+
+    assert er.status("unknown") == UserStatus("none")
