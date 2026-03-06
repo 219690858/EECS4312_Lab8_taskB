@@ -117,3 +117,29 @@ def test_status_unknown_user():
     er = EventRegistration(capacity=1)
 
     assert er.status("unknown") == UserStatus("none")
+    
+
+# Test: canceling a waitlisted user does not affect registered users
+def test_cancel_waitlisted_does_not_change_registered():
+    er = EventRegistration(capacity=1)
+
+    er.register("u1")
+    er.register("u2")  # waitlisted
+
+    er.cancel("u2")
+
+    assert er.status("u1") == UserStatus("registered")
+
+
+# Test: snapshot after several operations remains consistent
+def test_snapshot_consistency():
+    er = EventRegistration(capacity=2)
+
+    er.register("u1")
+    er.register("u2")
+    er.register("u3")
+
+    snap = er.snapshot()
+
+    assert snap["registered"] == ["u1", "u2"]
+    assert snap["waitlist"] == ["u3"]
