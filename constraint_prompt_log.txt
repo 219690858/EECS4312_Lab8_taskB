@@ -1,0 +1,36 @@
+Student name: Youwei Qin
+Student ID: 219690858
+-------------------------------------------------------------------------------------------
+Prompt 1: Explain "prefers minimal interaction" in the persona.
+Purpose: clarify persona need
+Response summary: The minimal interaction means the user prefers the system to handle routine tasks automatically and avoid unnecessary steps or confirmations. 
+The system should reduce manual actions and simplify user interaction whenever possible. 
+
+-------------------------------------------------------------------------------------------
+Prompt 2: If a user who needs clear explanations and consistent system responses, what should the system do.
+Purpose: To understand perona need
+Response summary: The system should provide clear feedback when actions are changed or rejected and does not change the response a lot for similar inputs.
+This helps users understand the system’s decisions and build trust in automated behavior.
+
+-------------------------------------------------------------------------------------------
+Prompt 3： The user does not want too many notifications or duplicate system messages, how could a system reduce the notification overload.
+Purpose: To understand the user's concern and how this would relate to system behavior.
+Response: The response suggested limiting duplicate notifications and ensuring the system only sends necessary reminders. 
+It also mentioned that reducing unnecessary alerts can help prevent notification overload for the user.
+
+-------------------------------------------------------------------------------------------
+Prompt 4: Here are the functional requirements I created from the two personas, any advice or misssing requirements? The system shall allow users to register for events.
+The system shall allow users to create reminders.
+The system shall automatically resolve conflicts between reminders when they occur at the same time.
+The system shall maintain a predictable and consistent ordering of reminders when displayed to the user.
+The system shall limit duplicate notifications for the same reminder or event.
+The system shall automatically promote users from a waitlist when a spot becomes available.
+The system shall provide clear explanations when reminders are moved, skipped, or cancelled.
+The system shall display an error message when a user action cannot be completed.
+The system shall prevent duplicate registrations for the same event by the same user.
+The system shall validate user inputs and reject invalid inputs.
+Purpose: To improve the functional requirements and find missing requirements.
+Response: 
+- The response suggested to consider deterministic behavior when multiple reminders share the same timestamp.
+- It recommended ensuring the system provides clear feedback when an action cannot be completed.
+- It confirmed that the current requirements already cover key persona needs such as automation, predictable behavior, explanations, and error handling.
