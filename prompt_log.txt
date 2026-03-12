@@ -1,208 +1,179 @@
 ## Student Name: Youwei Qin
 ## Student ID: 219690858
 
-Prompt #1: {
-    Purpose: Find out any missing requriments.
+------------------------------------LAB 9------------------------------------------------
 
-    I am planning to design a system in python that could manage event registration for one event with limited capacity. 
-It keeps extra users in a FIFO waitlist, prevents duplicate registrations, and promotes the earliest waitlisted user when a spot becomes available. 
-Here's the functional requirements:
-FR1: The system shall accept a fixed event capacity during initialization.
+Prompt #1:
+Based on the Lab8 information and code, now I got these two personas. 
+Jane (Primary User): 
+Jane prefers automation and minimal interaction. She expects the system to automatically resolve conflicts and behave predictably.
 
-FR2: The system shall allow users to register for the event.
+Mo (Edge User):
+Mo requires clear explanations and consistent system behavior. Mo expects the system to explicitly handle edge cases and provide clear error messages when actions fail.
+C1: The system shall automatically resolve registration conflicts when the event capacity is reached without requiring additional user interaction.
+Derived from persona attribute: (Jane) Trusts the system to resolve conflicts and enforce rules automatically.
 
-FR3: The system shall add users to the registered list if the current number of registered users is less than the event capacity.
+Function requirements:
+FR1: The system shall automatically resolve capacity conflicts by placing users into the waitlist when the event capacity is reached.
+FR2: The system shall maintain deterministic FIFO ordering of users in the waitlist.
+Derived from constraint C3 (Jane - predictable and stable ordering).
+FR3: The system shall display a clear error message explaining why a user action cannot be completed.
+Derived from constraint C7 (Mo - clear explanations for system decisions).
+FR4: The system shall detect and explicitly report duplicate registrations or invalid cancellation requests.
+Derived from constraint C5 (Mo - explicit handling of edge cases).
+FR5: The system shall produce consistent results when the same sequence of registration and cancellation operations is executed multiple times.
+Derived from constraint C8 (Mo - deterministic behavior).
 
-FR4: The system shall place users into a FIFO waitlist if the event capacity has been reached.
+Constraint:
+C2: The system shall avoid producing duplicate system responses for the same user action.
+Derived from persona attribute: (Jane) Limited notification or information overload.
 
-FR5: The system shall prevent duplicate registrations for the same user.
+C3: The system shall maintain a predictable and consistent ordering of users in the waitlist.
+Derived from persona attribute: (Jane) Predictable and stable ordering of system decisions.
 
-FR6: The system shall allow a registered user to cancel their registration.
+C4:The system shall provide clear and final results after each operation so that users do not need to revisit previous system decisions.
+Derived from persona attribute:(Jane) Acts quickly and rarely revisits system suggestions
 
-FR7: The system shall allow a waitlisted user to cancel their waitlist position.
+C5:The system shall detect and explicitly report errors like duplicate registrations or invalid cancellation requests.
+Derived from persona attribute:(Mo)Explicitly handle edge cases instead of silent failure
 
-FR8: When a registered user cancels, the system shall automatically promote the first user in the waitlist to the registered list.
+C6: The system shall provide feedback about the user status after registration, cancellation, or waitlist promotion.
+Derived from persona attribute: (Mo) Clear explanations when system state changes occur.
 
-FR9: The system shall allow users to query their current status.
+C7:The system shall provide clear error messages when a user action is rejected.
+Derived from persona attribute:(Mo)Not understanding why the system changed or rejected an action
 
-FR10: The system shall maintain FIFO ordering in the waitlist , constraints: C1: The event capacity must be a non-negative integer.
-The constraints：
-C2: The system must correctly handle the case where the capacity is zero.
-C3: Promotions occur deterministically under identical operation sequences
-C4: The system must update the registration and waitlist lists after every operation.
-C5: Waitlist ordering preserves FIFO behavior.
-C6: Operations must be processed sequentially in the order they are received.
-Invariants:
-The number of registered users must never exceed the event capacity.
-A user may appear only once in the system.
-A user may not simultaneously exist in multiple states.
-Acceptance Criteria:
-AC1: Negative capacity values must be rejected.
-AC2: If capacity is zero, users registering must be placed in the waitlist.
-AC3: If capacity allows, users registering must be added to the registered list.
-AC4: If capacity is full, additional users registering must be added to the waitlist.
-AC5: When a registered user cancels, the earliest waitlisted user must be promoted.
-AC6: Executing the same sequence of operations must always produce the same promotion result.Question:
-Before implementing the system, are there any ambiguities or missing clarifications exist.?}
+C8:The system shall produce consistent results when the same sequence of operations is executed multiple times.
+Derived from persona attribute:(Mo)Inconsistent responses across repeated or boundary scenarios
 
-Response #1: {
-The model suggested to clarify some possible ambiguities in the requirements. 
-1.How users are uniquely identified
-2.How duplicate registration attempts should be handled
-3.What should happen if a user cancels but is not currently registered or on the waitlist. 
-4.The format of the query result and confirming that the waitlist promotion must always follow FIFO order.
-}
+AC1:
+Given the event capacity has been reached
+When a user attempts to register for the event
+Then the system shall automatically place the user into the waitlist without requiring additional user interaction.
+Linked Constraint ID(s): C1
 
-Decision #1: {
-1. Accepted: Each user will be uniquely identified by a user_id.
-2. Accepted: Duplicate registration attempts will not modify the system state.
-3. Accepted: Cancelling a user not currently in the system will not modify the system state.
-4. Rejected: FIFO promotion clarification is unnecessary because FIFO ordering is already defined in FR10 and constraint C5.
-}
+AC2:
+Given a user attempts to perform the same registration action multiple times
+When the system processes the request
+Then the system shall reject duplicate registration attempts and return an error.
+Linked Constraint ID(s): C2
 
---------------------------------------------------
+AC3:
+Given multiple users are on the waitlist
+When the system displays the waitlist
+Then the users shall appear in a consistent and predictable order.
+Linked Constraint ID(s): C3
 
-Prompt #2:{
-Purpose: finish the to-do
+AC4:
+Given a user performs a registration or cancellation action
+When the operation is completed
+Then the system shall display the final result of the operation to the user.
+Linked Constraint ID(s): C4
 
-Based on the previous suggestions, here are my decisions:
-1. Accepted: Each user will be uniquely identified by a user_id.
-2. Accepted: Duplicate registration attempts will not modify the system state.
-3. Accepted: Cancelling a user not currently in the system will not modify the system state.
-4. Rejected: FIFO promotion clarification is unnecessary because FIFO ordering is already defined in FR10 and constraint C5.
-Based on all the requirements I provided earlier, please help me complete the TODO parts in the provided EventRegistration class. Do not modify the other parts 
-that do not have "TODO" comments
+AC5:
+Given a user attempts to register again after already being registered or waitlisted.
+When the system processes the request
+Then the system shall explicitly report the duplicate registration error.
+Linked Constraint ID(s): C5
 
-from dataclasses import dataclass
-from typing import List, Optional
+AC6:
+Given a user registers or cancels their registration
+When the system processes the operation
+Then the system shall return the user’s updated status.
+Linked Constraint ID(s): C6
 
+AC7:
+Given a user attempts an action that is rejected
+When the system processes the request
+Then the system shall provide a clear error message explaining why the action failed.
+Linked Constraint ID(s): C7
 
-class DuplicateRequest(Exception):
-    """Raised if a user tries to register but is already registered or waitlisted."""
-    pass
+AC8:
+Given the same sequence of operations is executed multiple times
+When the system processes these operations
+Then the system shall produce the same results each time.
+Linked Constraint ID(s): C8
 
-
-class NotFound(Exception):
-    """Raised if a user cannot be found for cancellation (if required by handout)."""
-    pass
-
-
-@dataclass(frozen=True)
-class UserStatus:
-    """
-    state:
-      - "registered"
-      - "waitlisted"
-      - "none"
-    position: 1-based waitlist position if waitlisted; otherwise None
-    """
-    state: str
-    position: Optional[int] = None
+Any missing constraints or any modification I need to make?
 
 
-class EventRegistration:
-    """
-    Students must implement this class per the lab handout.
-    Deterministic ordering is required (e.g., FIFO waitlist, predictable registration order).
-    """
+Response summary:
+1. The LLM suggested clarifying the waitlist promotion rule to ensure deterministic system behavior.
+2. The LLM recommended improving the clarity of error messages when user actions are rejected.
 
-    def __init__(self, capacity: int) -> None:
-        """
-        Args:
-            capacity: maximum number of registered users (>= 0)
-        """
-        # TODO: Initialize internal data structures
-        raise NotImplementedError("EventRegistration.__init__ not implemented yet")
+Decision: Accept
 
-    def register(self, user_id: str) -> UserStatus:
-        """
-        Register a user:
-          - if capacity available -> registered
-          - else -> waitlisted (FIFO)
 
-        Raises:
-            DuplicateRequest if user already exists (registered or waitlisted)
-        """
-        # TODO: Implement per lab handout
-        raise NotImplementedError("register not implemented yet")
+----------------------------------------------
+Prompt #2: 
+Also, here are the edge cases: 
+EC1:
+Event capacity is zero and a user attempts to register.
+Expected system behavior:
+The system should place the user directly into the waitlist because no registration slots are available.
 
-    def cancel(self, user_id: str) -> None:
-        """
-        Cancel a user:
-          - if registered -> remove and promote earliest waitlisted user (if any)
-          - if waitlisted -> remove from waitlist
-          - behavior when user not found depends on handout (raise NotFound or ignore)
+EC2:
+A user attempts to register again after already being registered or waitlisted.
+Expected system behavior:
+The system should reject the request and report a duplicate registration error.
 
-        Raises:
-            NotFound (if required by handout)
-        """
-        # TODO: Implement per lab handout
-        raise NotImplementedError("cancel not implemented yet")
+EC3:
+A user attempts to cancel a registration that does not exist in the system.
+Expected system behavior:
+The system should report an error indicating that the user is not found.
 
-    def status(self, user_id: str) -> UserStatus:
-        """
-        Return status of a user:
-          - registered
-          - waitlisted with position (1-based)
-          - none
-        """
-        # TODO: Implement per lab handout
-        raise NotImplementedError("status not implemented yet")
+EC4:
+A registered user cancels when there are users in the waitlist.
+Expected system behavior:
+The system should automatically promote the earliest user from the waitlist.
 
-    def snapshot(self) -> dict:
-        """
-        (Optional helper for debugging/tests)
-        Return a deterministic snapshot of internal state.
-        """
-        # TODO: Implement if required/allowed
-        raise NotImplementedError("snapshot not implemented yet")
-}
+EC5:
+A user on the waitlist cancels before being promoted.
+Expected system behavior:
+The system should remove the user from the waitlist and update the ordering correctly.
 
-Response #2: {
-The GPT suggested to have two lists: registered users and  waitlisted users. 
-The register method checks the capacity and adds users to the registered list or the waitlist accordingly. 
-The cancel method removes a user and promotes the earliest waitlisted user if a spot becomes available.
-The status method returns whether the user is registered, waitlisted with a position, or not in the system. 
-The snapshot method returns the current registration state.
-}
+EC6:
+Multiple registrations and cancellations occur rapidly in sequence.
+Expected system behavior:
+The system must maintain deterministic ordering and a consistent system state after each operation.
 
-Decision #: {
-Accepted the suggested implementation approach and used it to complete the TODO methods in solution.py.
-}
+EC7:
+A user queries their status immediately after successful registration.
+Expected system behavior:
+The system should return the updated status showing the user as registered.
 
+EC8:
+A user attempts to perform the same registration action multiple times.
+Expected system behavior:
+The system should reject duplicate registration attempts and report an error.
+
+
+Response summary:
+1. The LLM identified a potential ambiguity when multiple operations occur rapidly in sequence.
+2. The LLM recommended clarifying system behavior to ensure the system state remains consistent after each operation.
+
+Decision: Accept
 
 ----------------------------------------------------
-prompt #3: {
-    purpose： Find out the reason that failing test related to cancelling a non-existent user.
+Prompt #3:
+I have accepted your advice, so based on the updated requirements and constraints and the Lab8 solution.py I gave you before, review my code and let me know if it meets the the new requirements and constraints.
 
-    I implemented the EventRegistration system based on the complete code you provided and then I run the tests.py, the following test failed:
-________________________________________________ test_capacity_zero_all_waitlisted_and_promotion_never_happens ________________________________________________
+Response summary:
+The LLM confirmed that the implementation maintains deterministic FIFO waitlist ordering, handles duplicate registrations and invalid cancellations explicitly, and ensures consistent system behavior consistent with the defined constraints and edge cases.
 
-    def test_capacity_zero_all_waitlisted_and_promotion_never_happens():
-        er = EventRegistration(capacity=0)
-        assert er.register("u1") == UserStatus("waitlisted", 1)
-        assert er.register("u2") == UserStatus("waitlisted", 2)
-    
-        # No one can ever be registered when capacity=0
-        assert er.status("u1") == UserStatus("waitlisted", 1)
-        assert er.status("u2") == UserStatus("waitlisted", 2)
-        assert er.snapshot()["registered"] == []
-    
-        # Cancel unknown should raise NotFound
->       with pytest.raises(NotFound):
-             ^^^^^^^^^^^^^^^^^^^^^^^
-E       Failed: DID NOT RAISE <class 'solution.NotFound'>
+Decision: Accept
 
-tests.py:79: Failed
-=================================================================== short test summary info ===================================================================
-FAILED tests.py::test_capacity_zero_all_waitlisted_and_promotion_never_happens - Failed: DID NOT RAISE <class 'solution.NotFound'>}
+----------------------------------------------------
 
-Response #3: {
-The model explained that the cancel() method currently ignores cancellation requests for users not in the system. 
-However, the test suite requires that cancelling a non-existent user should raise a NotFound exception. 
-The fix is to modify cancel() so that it checks whether the user exists, and raises NotFound if the user is not found.
-}
+Prompt #4:
+I need to create executable tests for the Event Registration system.
+The test suite must include at least five tests and at least two tests
+that cover edge cases identified earlier when deriving constraints from the personas.
+Each test should verify a specific acceptance criterion or system constraint from my requirements.
+Above each test, include a comment indicating which constraint and acceptance criterion it verifies,
+for example: # Covers C3, AC2.
 
-Decision #3: {
-    Accepted
-}
+Response:
+LLM give me total of 6 test cases
+
+Decision: Accept

@@ -1,0 +1,246 @@
+Student name: Youwei Qin
+Student ID: 219690858
+
+## 1. Problem Understanding - Describe the problem your system solves.
+System purpose: The system manages event registrations for a single event with a waitlist. 
+It allows users to register, cancel their registration, and check their status while automatically managing the waitlist.
+
+Inputs to the system:
+
+1. capacity
+Description: The maximum number of users that can be registered for the event.
+Type: Integer
+Format: Numeric value
+Valid Values: Non-negative integer.
+
+2. user_id
+Description: A unique identifier representing the user performing an action in the system.
+Type: String
+Format: Text
+Valid Values: Non-empty unique string.
+
+3. userAction
+Description: The action requested by the user in the system.
+Type: String
+Format: Text command
+Valid Values: "register", "cancel", or "status".
+
+
+Outputs produced by the system:
+systemResponse
+Description:
+1. The result returned by the system after processing a user request. The system returns users current registration status, or an error message if the action cannot be completed.
+Type: UserStatus or error message
+Format: Text message
+Valid Values: Messages such as "registration successful" , "waitlisted", "registered", or an error explanation.
+
+
+Primary goal of the system: The primary goal of the system is to provide a reliable and predictable registration process that automatically handles waitlist promotions and clearly reports system decisions to users.
+---
+
+
+## 2. Assumptions - List assumptions about the environment, users, or inputs.
+A1: Event capacity is a non-negative integer.
+A2: Each user is identified by a unique user ID.
+A3: A user can only appear once in the system (either registered or waitlisted).
+A4: The system processes user operations sequentially.
+A5: The waitlist follows a FIFO (first-in-first-out) ordering.
+A6: Users may query their registration status at any time.
+---
+
+## 3. Functional Requirements - Describe the main behaviors the system must perform.
+FR1: The system shall automatically resolve capacity conflicts by placing users into the waitlist.
+Derived from constraint C1 (Jane - trusts the system to resolve conflicts automatically).
+
+FR2: The system shall maintain deterministic FIFO ordering of users in the waitlist.
+Derived from constraint C3 (Jane - predictable and stable ordering).
+
+FR3: The system shall display a clear error message explaining why a user action cannot be completed.
+Derived from constraint C7 (Mo - clear explanations for system decisions).
+
+FR4: The system shall detect and explicitly report duplicate registrations or invalid cancellation requests.
+Derived from constraint C5 (Mo - explicit handling of edge cases).
+
+FR5: The system shall produce consistent results when the same sequence of registration and cancellation operations is executed multiple times.
+Derived from constraint C8 (Mo - deterministic behavior).
+---
+## 4. System Constraints - Constraints are conditions the system must always respect. Each constraint should reference the persona attribute it originates from.
+C1: The system shall automatically resolve registration conflicts when the event capacity is reached without requiring additional user interaction.
+Derived from persona attribute: (Jane) Trusts the system to resolve conflicts and enforce rules automatically.
+
+C2: The system shall avoid producing duplicate system responses for the same user action.
+Derived from persona attribute: (Jane) Limited notification or information overload.
+
+C3: The system shall maintain a predictable and consistent ordering of users in the waitlist.
+Derived from persona attribute: (Jane) Predictable and stable ordering of system decisions.
+
+C4:The system shall provide clear and final results after each operation so that users do not need to revisit previous system decisions.
+Derived from persona attribute:(Jane) Acts quickly and rarely revisits system suggestions
+
+C5:The system shall detect and explicitly report errors like duplicate registrations or invalid cancellation requests.
+Derived from persona attribute:(Mo)Explicitly handle edge cases instead of silent failure
+
+C6: The system shall provide feedback about the user status after registration, cancellation, or waitlist promotion.
+Derived from persona attribute: (Mo) Clear explanations when system state changes occur.
+
+C7:The system shall provide clear error messages when a user action is rejected.
+Derived from persona attribute:(Mo)Not understanding why the system changed or rejected an action
+
+C8:The system shall produce consistent results when the same sequence of operations is executed multiple times.
+Derived from persona attribute:(Mo)Inconsistent responses across repeated or boundary scenarios
+---
+## 5. Acceptance Criteria - Acceptance criteria define how system behavior will be verified.
+AC1:
+Given the event capacity has been reached
+When a user attempts to register for the event
+Then the system shall automatically place the user into the waitlist without requiring additional user interaction.
+Linked Constraint ID(s): C1
+
+AC2:
+Given a user attempts to perform the same registration action multiple times
+When the system processes the request
+Then the system shall avoid producing duplicate system responses or duplicate registrations.
+Linked Constraint ID(s): C2
+
+AC3:
+Given multiple users are on the waitlist
+When the system displays the waitlist
+Then the users shall appear in a consistent and predictable order.
+Linked Constraint ID(s): C3
+
+AC4:
+Given a user performs a registration or cancellation action
+When the operation is completed
+Then the system shall display the final result of the operation to the user.
+Linked Constraint ID(s): C4
+
+AC5:
+Given a user attempts to register again after already being registered or waitlisted.
+When the system processes the request
+Then the system shall explicitly report the duplicate registration error.
+Linked Constraint ID(s): C5
+
+AC6:
+Given a user registers or cancels their registration
+When the system processes the operation
+Then the system shall return the user’s updated status.
+Linked Constraint ID(s): C6
+
+
+AC7:
+Given a user attempts an action that is rejected
+When the system processes the request
+Then the system shall provide a clear error message explaining why the action failed.
+Linked Constraint ID(s): C7
+
+AC8:
+Given the same sequence of operations is executed multiple times
+When the system processes these operations
+Then the system shall produce the same results each time.
+Linked Constraint ID(s): C8
+---
+## 6. Edge Cases - Describe unusual or boundary situations the system must handle.
+EC1:
+Event capacity is zero and a user attempts to register.
+Expected system behavior:
+The system should place the user directly into the waitlist because no registration slots are available.
+
+EC2:
+A user attempts to register again after already being registered or waitlisted.
+Expected system behavior:
+The system should reject the request and report a duplicate registration error.
+
+EC3:
+A user attempts to cancel a registration that does not exist in the system.
+Expected system behavior:
+The system should report an error indicating that the user is not found.
+
+EC4:
+A registered user cancels when there are users in the waitlist.
+Expected system behavior:
+The system should automatically promote the earliest user from the waitlist.
+
+EC5:
+A user on the waitlist cancels before being promoted.
+Expected system behavior:
+The system should remove the user from the waitlist and update the ordering correctly.
+
+EC6:
+Multiple registrations and cancellations occur rapidly in sequence.
+Expected system behavior:
+The system must maintain deterministic ordering and a consistent system state after each operation.
+
+EC7:
+A user queries their status immediately after successful registration.
+Expected system behavior:
+The system should return the updated status showing the user as registered.
+
+EC8:
+A user attempts to perform the same registration action multiple times.
+Expected system behavior:
+The system should reject duplicate registration attempts and report an error.
+
+---
+## 7. Traceability - Link functional requirements to constraints and acceptance criteria. FR → C → AC mapping
+FR1 → C1 → AC1
+FR2 → C3 → AC3
+FR3 → C7 → AC7
+FR4 → C5 → AC5
+FR5 → C8 → AC8
+
+
+---------------------------------------------
+Revision Notes
+---------
+Revision Note 1
+Requirement updated: FR1 - Waitlist handling rule
+Reason: During requirement review, the LLM suggested clarifying how capacity conflicts should be handled to ensure deterministic behavior.
+Action: Clarified that users will be placed into the waitlist automatically when the event capacity is reached.
+Triggered by LLM feedback: Yes
+
+Original requirement:
+FR1: The system shall resolve capacity conflicts when the event capacity is reached.
+Revised requirement:
+FR1: The system shall automatically resolve capacity conflicts by placing users into the waitlist when the event capacity is reached.
+
+---------
+Revision Note 2
+Requirement updated: AC7 - Error message explanation
+Reason: The LLM suggested improving clarity of system responses when user actions are rejected.
+Action: Clarified that the system must explain why the action failed.
+Triggered by LLM feedback: Yes
+
+Original acceptance criterion:
+AC7:
+Given a user attempts an action that is rejected
+When the system processes the request
+Then the system shall provide an error message.
+
+Revised acceptance criterion:
+AC7:
+Given a user attempts an action that is rejected
+When the system processes the request
+Then the system shall provide a clear error message explaining why the action failed.
+
+---------
+Revision Note 3
+Requirement updated: EC6 - Rapid sequential operations
+Reason: The LLM identified that rapid sequences of registrations and cancellations could cause ambiguous system behavior.
+Action: Added clarification that the system must maintain a consistent state and deterministic ordering after each operation.
+Triggered by LLM feedback: Yes
+
+Original edge case:
+EC6:
+Multiple registrations and cancellations occur rapidly in sequence.
+Expected system behavior:
+The system should maintain consistent ordering and system state after each operation.
+
+Revised edge case:
+EC6:
+Multiple registrations and cancellations occur rapidly in sequence.
+Expected system behavior:
+The system must maintain deterministic ordering and a consistent system state after each operation.
+
+
+
+
